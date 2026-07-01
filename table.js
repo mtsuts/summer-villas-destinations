@@ -1,13 +1,13 @@
 const TABLE_COLUMNS = [
-  { key: "RANKING", label: "Rank", icon: "rank" },
-  { key: "VALUE_RANK", label: "Value", icon: "value" },
-  { key: "Hotel Ave. Rating Rank", label: "Hotel avg. rating", icon: "hotel-rating" },
-  { key: "Hotel Cost Rank", label: "Hotel cost", icon: "hotel-cost" },
-  { key: "Restaurant Ave. rating Rank", label: "Restaurant avg. rating", icon: "restaurant-rating" },
-  { key: "Restaurant Cost Rank", label: "Restaurant cost", icon: "restaurant-cost" },
-  { key: "Transport Cost Rank", label: "Transport cost", icon: "transport" },
-  { key: "Attraction Ave. rating rank", label: "Attraction avg. rating", icon: "attraction-rating" },
-  { key: "Attraction cost Rank", label: "Attraction cost", icon: "attraction-cost" },
+  { key: "RANKING", label: "Rank", icon: "rank", display: "raw" },
+  { key: "VALUE SCORE", label: "Value", icon: "value", display: "value-score" },
+  { key: "Hotel Ave. Rating Rank", label: "Hotel avg. rating", icon: "hotel-rating", display: "rank" },
+  { key: "Hotel Cost Rank", label: "Hotel cost", icon: "hotel-cost", display: "rank" },
+  { key: "Restaurant Ave. rating Rank", label: "Restaurant avg. rating", icon: "restaurant-rating", display: "rank" },
+  { key: "Restaurant Cost Rank", label: "Restaurant cost", icon: "restaurant-cost", display: "rank" },
+  { key: "Transport Cost Rank", label: "Transport cost", icon: "transport", display: "rank" },
+  { key: "Attraction Ave. rating rank", label: "Attraction avg. rating", icon: "attraction-rating", display: "rank" },
+  { key: "Attraction cost Rank", label: "Attraction cost", icon: "attraction-cost", display: "rank" },
 ]
 
 const ROWS_PER_PAGE = 10
@@ -131,26 +131,13 @@ const addValueRanks = (rows) => {
   return rows
 }
 
-const formatOrdinal = (value) => {
-  const number = parseInt(value, 10)
-  const remainder = number % 100
-
-  if (remainder >= 11 && remainder <= 13) {
-    return `${number}th`
-  }
-
-  const suffixes = ["th", "st", "nd", "rd"]
-  return `${number}${suffixes[number % 10] || suffixes[0]}`
-}
-
 const isTiedRank = (rows, columnKey, rankValue) => {
   const rank = parseInt(rankValue, 10)
   return rows.filter((row) => parseInt(row[columnKey], 10) === rank).length > 1
 }
 
 const formatRankLabel = (rows, columnKey, rankValue) => {
-  const ordinal = formatOrdinal(rankValue)
-  return isTiedRank(rows, columnKey, rankValue) ? `=${ordinal}` : ordinal
+  return isTiedRank(rows, columnKey, rankValue) ? `=${rankValue}` : rankValue
 }
 
 const getPillClass = (rankValue) => {
@@ -167,12 +154,39 @@ const getPillClass = (rankValue) => {
   return "rank-pill--mid"
 }
 
+const formatCellDisplay = (row, column, allRows) => {
+  const value = row[column.key]
+
+  if (column.display === "value-score") {
+    return parseFloat(value).toFixed(3)
+  }
+
+  if (column.display === "raw") {
+    return value
+  }
+
+  return formatRankLabel(allRows, column.key, value)
+}
+
+const getCellPillClass = (row, column) => {
+  if (column.display === "value-score") {
+    return getPillClass(row.VALUE_RANK)
+  }
+
+  return getPillClass(row[column.key])
+}
+
 const sortRows = (rows, key, direction = "asc") => {
   const sorted = [...rows]
   const multiplier = direction === "asc" ? 1 : -1
 
   if (key === "CITY") {
     sorted.sort((a, b) => multiplier * a.CITY.localeCompare(b.CITY))
+    return sorted
+  }
+
+  if (key === "VALUE SCORE") {
+    sorted.sort((a, b) => multiplier * (parseFloat(a[key]) - parseFloat(b[key])))
     return sorted
   }
 
@@ -332,9 +346,8 @@ class DestinationTable {
               <span class="city-pill">${row.CITY}, <span class="city-pill__country">${row.COUNTRY}</span></span>
             </td>
             ${TABLE_COLUMNS.map((column) => {
-          const rankValue = row[column.key]
-          const label = formatRankLabel(this.baseRows, column.key, rankValue)
-          const pillClass = getPillClass(rankValue)
+          const label = formatCellDisplay(row, column, this.baseRows)
+          const pillClass = getCellPillClass(row, column)
           return `
                 <td>
                   <span class="rank-pill ${pillClass}">${label}</span>
