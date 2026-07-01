@@ -1,13 +1,62 @@
 const TABLE_COLUMNS = [
-  { key: "RANKING", label: "Rank", icon: "rank", display: "raw" },
-  { key: "VALUE SCORE", label: "Value", icon: "value", display: "value-score" },
-  { key: "Hotel Ave. Rating Rank", label: "Hotel avg. rating", icon: "hotel-rating", display: "rank" },
-  { key: "Hotel Cost Rank", label: "Hotel cost", icon: "hotel-cost", display: "rank" },
-  { key: "Restaurant Ave. rating Rank", label: "Restaurant avg. rating", icon: "restaurant-rating", display: "rank" },
-  { key: "Restaurant Cost Rank", label: "Restaurant cost", icon: "restaurant-cost", display: "rank" },
-  { key: "Transport Cost Rank", label: "Transport cost", icon: "transport", display: "rank" },
-  { key: "Attraction Ave. rating rank", label: "Attraction avg. rating", icon: "attraction-rating", display: "rank" },
-  { key: "Attraction cost Rank", label: "Attraction cost", icon: "attraction-cost", display: "rank" },
+  { key: "RANKING", label: "Rank", icon: "rank", display: "raw", sort: "rank" },
+  { key: "VALUE SCORE", label: "Value", icon: "value", display: "value-score", sort: "float", rankKey: "VALUE_RANK" },
+  {
+    key: "AVG. HOTEL RATINGS (3 STAR)",
+    label: "Hotel avg. rating",
+    icon: "hotel-rating",
+    display: "raw",
+    sort: "float",
+    rankKey: "Hotel Ave. Rating Rank",
+  },
+  {
+    key: "AVG. HOTEL PRICE PER NIGHT (3 STAR)",
+    label: "Hotel cost",
+    icon: "hotel-cost",
+    display: "raw",
+    sort: "price",
+    rankKey: "Hotel Cost Rank",
+  },
+  {
+    key: "AVG. RESTAURANT RATINGS",
+    label: "Restaurant avg. rating",
+    icon: "restaurant-rating",
+    display: "raw",
+    sort: "float",
+    rankKey: "Restaurant Ave. rating Rank",
+  },
+  {
+    key: "Cost of Meal for Two at a MidRange Restaurant (Three Courses, Without Drinks)",
+    label: "Restaurant cost",
+    icon: "restaurant-cost",
+    display: "price",
+    sort: "price",
+    rankKey: "Restaurant Cost Rank",
+  },
+  {
+    key: "LOCAL TRANSPORT COST (ONE WAY TICKET)",
+    label: "Transport cost",
+    icon: "transport",
+    display: "price",
+    sort: "price",
+    rankKey: "Transport Cost Rank",
+  },
+  {
+    key: "AVG. ATTRACTION RATINGS",
+    label: "Attraction avg. rating",
+    icon: "attraction-rating",
+    display: "raw",
+    sort: "float",
+    rankKey: "Attraction Ave. rating rank",
+  },
+  {
+    key: "AVG. ATTRACTION PRICES",
+    label: "Attraction cost",
+    icon: "attraction-cost",
+    display: "raw",
+    sort: "price",
+    rankKey: "Attraction cost Rank",
+  },
 ]
 
 const ROWS_PER_PAGE = 10
@@ -154,11 +203,26 @@ const getPillClass = (rankValue) => {
   return "rank-pill--mid"
 }
 
+const parsePriceValue = (value) => parseFloat(String(value).replace(/[£,]/g, ""))
+
+const formatPriceDisplay = (value) => {
+  const text = String(value).trim()
+  if (text.startsWith("£")) {
+    return text
+  }
+
+  return `£${parsePriceValue(text).toFixed(2)}`
+}
+
 const formatCellDisplay = (row, column, allRows) => {
   const value = row[column.key]
 
   if (column.display === "value-score") {
     return parseFloat(value).toFixed(3)
+  }
+
+  if (column.display === "price") {
+    return formatPriceDisplay(value)
   }
 
   if (column.display === "raw") {
@@ -168,25 +232,30 @@ const formatCellDisplay = (row, column, allRows) => {
   return formatRankLabel(allRows, column.key, value)
 }
 
-const getCellPillClass = (row, column) => {
-  if (column.display === "value-score") {
-    return getPillClass(row.VALUE_RANK)
-  }
+const getColumnConfig = (key) => TABLE_COLUMNS.find((column) => column.key === key)
 
-  return getPillClass(row[column.key])
+const getCellPillClass = (row, column) => {
+  const rankKey = column.rankKey || column.key
+  return getPillClass(row[rankKey])
 }
 
 const sortRows = (rows, key, direction = "asc") => {
   const sorted = [...rows]
   const multiplier = direction === "asc" ? 1 : -1
+  const column = getColumnConfig(key)
 
   if (key === "CITY") {
     sorted.sort((a, b) => multiplier * a.CITY.localeCompare(b.CITY))
     return sorted
   }
 
-  if (key === "VALUE SCORE") {
+  if (column?.sort === "float") {
     sorted.sort((a, b) => multiplier * (parseFloat(a[key]) - parseFloat(b[key])))
+    return sorted
+  }
+
+  if (column?.sort === "price") {
+    sorted.sort((a, b) => multiplier * (parsePriceValue(a[key]) - parsePriceValue(b[key])))
     return sorted
   }
 
