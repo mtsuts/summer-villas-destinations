@@ -1,13 +1,13 @@
 const TABLE_COLUMNS = [
-  { key: "RANKING", label: "Rank", icon: "rank", display: "raw", sort: "rank" },
-  { key: "VALUE SCORE", label: "Value", icon: "value", display: "value-score", sort: "float", rankKey: "VALUE_RANK" },
+  { key: "RANKING", label: "Rank", icon: "rank", display: "raw", sort: "rank", rankOrder: "asc" },
+  { key: "VALUE SCORE", label: "Value", icon: "value", display: "value-score", sort: "float", rankOrder: "desc" },
   {
     key: "AVG. HOTEL RATINGS (3 STAR)",
     label: "Hotel avg. rating",
     icon: "hotel-rating",
     display: "raw",
     sort: "float",
-    rankKey: "Hotel Ave. Rating Rank",
+    rankOrder: "desc",
   },
   {
     key: "AVG. HOTEL PRICE PER NIGHT (3 STAR)",
@@ -15,7 +15,7 @@ const TABLE_COLUMNS = [
     icon: "hotel-cost",
     display: "raw",
     sort: "price",
-    rankKey: "Hotel Cost Rank",
+    rankOrder: "asc",
   },
   {
     key: "AVG. RESTAURANT RATINGS",
@@ -23,7 +23,7 @@ const TABLE_COLUMNS = [
     icon: "restaurant-rating",
     display: "raw",
     sort: "float",
-    rankKey: "Restaurant Ave. rating Rank",
+    rankOrder: "desc",
   },
   {
     key: "Cost of Meal for Two at a MidRange Restaurant (Three Courses, Without Drinks)",
@@ -31,7 +31,7 @@ const TABLE_COLUMNS = [
     icon: "restaurant-cost",
     display: "price",
     sort: "price",
-    rankKey: "Restaurant Cost Rank",
+    rankOrder: "asc",
   },
   {
     key: "LOCAL TRANSPORT COST (ONE WAY TICKET)",
@@ -39,7 +39,7 @@ const TABLE_COLUMNS = [
     icon: "transport",
     display: "price",
     sort: "price",
-    rankKey: "Transport Cost Rank",
+    rankOrder: "asc",
   },
   {
     key: "AVG. ATTRACTION RATINGS",
@@ -47,7 +47,7 @@ const TABLE_COLUMNS = [
     icon: "attraction-rating",
     display: "raw",
     sort: "float",
-    rankKey: "Attraction Ave. rating rank",
+    rankOrder: "desc",
   },
   {
     key: "AVG. ATTRACTION PRICES",
@@ -55,7 +55,15 @@ const TABLE_COLUMNS = [
     icon: "attraction-cost",
     display: "raw",
     sort: "price",
-    rankKey: "Attraction cost Rank",
+    rankOrder: "asc",
+  },
+  {
+    key: "AVG. FLIGHT COST OVERALL",
+    label: "Flight cost",
+    icon: "flight-cost",
+    display: "raw",
+    sort: "price",
+    rankOrder: "asc",
   },
 ]
 
@@ -123,6 +131,18 @@ const HEADER_ICONS = {
 <path d="M31.7344 15H25.5293V13.6289H31.7285L31.7344 15ZM30.0176 11.5957H25.5117V10.2656H30.0176V11.5957ZM28.1367 8.91211L28.2832 12.457C28.2871 12.8438 28.207 13.1758 28.043 13.4531C27.8789 13.7266 27.5977 13.9512 27.1992 14.127L26.0918 13.6289C26.2129 13.5977 26.3027 13.5273 26.3613 13.418C26.4238 13.3047 26.4629 13.1699 26.4785 13.0137C26.4941 12.8574 26.502 12.7031 26.502 12.5508L26.3906 8.91211C26.3906 8.37305 26.5 7.91406 26.7188 7.53516C26.9414 7.15234 27.25 6.86133 27.6445 6.66211C28.043 6.45898 28.5059 6.35742 29.0332 6.35742C29.6035 6.35742 30.0859 6.45898 30.4805 6.66211C30.8789 6.86523 31.1797 7.14844 31.3828 7.51172C31.5898 7.875 31.6934 8.29883 31.6934 8.7832H30.0234C30.0234 8.52148 29.9785 8.31445 29.8887 8.16211C29.7988 8.00586 29.6797 7.89453 29.5312 7.82812C29.3828 7.75781 29.2188 7.72266 29.0391 7.72266C28.8633 7.72266 28.707 7.76758 28.5703 7.85742C28.4375 7.94727 28.332 8.08008 28.2539 8.25586C28.1758 8.43164 28.1367 8.65039 28.1367 8.91211Z" fill="#030303"/>
 </svg>
 `,
+"flight-cost": `<svg width="25" height="25" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M23.658 5.40579L5.41911 21.0397C5.00899 21.3913 4.3969 21.3677 4.01448 20.9853C3.63205 20.6029 3.60846 19.9908 3.96013 19.5807L19.594 1.34176C20.1323 0.803464 20.8633 0.5 21.6261 0.5C22.3879 0.5 23.1189 0.803486 23.6582 1.34176C24.1965 1.88105 24.5 2.61209 24.5 3.37388C24.5 4.13672 24.1963 4.8675 23.658 5.40579Z" stroke="black" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M3.96315 19.5794L2.38524 18.0015C2.05715 17.6734 2.17916 17.1721 2.59133 17.1382L6.40849 16.7281" stroke="black" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M8.27046 18.5899L7.86035 22.407C7.82651 22.8202 7.32516 22.9422 6.99707 22.6131L5.41916 21.0352" stroke="black" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M10.449 11.8404L1.19152 5.47623C0.800879 5.20761 0.549678 4.77906 0.506632 4.30739C0.46357 3.83577 0.631719 3.36926 0.966969 3.03399L0.970045 3.03092C1.38426 2.6167 1.99431 2.46292 2.55618 2.63106L15.1908 6.42154" stroke="black" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M13.1591 14.5504L19.5232 23.8079C19.7918 24.1985 20.2204 24.4497 20.692 24.4928C21.1637 24.5358 21.6302 24.3677 21.9654 24.0324L21.9685 24.0294C22.3827 23.6151 22.5365 23.0051 22.3684 22.4432L18.5779 9.80856" stroke="black" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M6.85265 3.92194L7.40118 3.37342C7.77131 2.99816 7.77131 2.39425 7.40118 2.019C7.02695 1.64682 6.42101 1.64682 6.04677 2.019L4.77026 3.2955" stroke="black" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M11.0212 5.17176L11.4651 4.72783V4.72885C11.8352 4.35257 11.8352 3.74969 11.4651 3.37343C11.0909 3.00125 10.4849 3.00125 10.1107 3.37343L8.93878 4.54534" stroke="black" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M21.0775 18.1467L21.626 17.5982C22.0012 17.2281 22.6051 17.2281 22.9804 17.5982C23.3526 17.9724 23.3526 18.5784 22.9804 18.9526L21.7039 20.2291" stroke="black" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M19.8276 13.9782L20.2716 13.5343H20.2705C20.6468 13.1642 21.2497 13.1642 21.626 13.5343C21.9981 13.9085 21.9981 14.5144 21.626 14.8887L20.4541 16.0606" stroke="black" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+`
 }
 
 const parseCSVLine = (line) => {
@@ -164,17 +184,57 @@ const parseCSV = (text) => {
   })
 }
 
-const addValueRanks = (rows) => {
-  const sorted = [...rows].sort(
-    (a, b) => parseFloat(b["VALUE SCORE"]) - parseFloat(a["VALUE SCORE"])
-  )
+const parsePriceValue = (value) => parseFloat(String(value).replace(/[£,]/g, ""))
 
-  let rank = 1
-  sorted.forEach((row, index) => {
-    if (index > 0 && row["VALUE SCORE"] !== sorted[index - 1]["VALUE SCORE"]) {
-      rank = index + 1
+const getMetricValue = (value, sortType) => {
+  if (sortType === "price") {
+    return parsePriceValue(value)
+  }
+
+  if (sortType === "float") {
+    return parseFloat(value)
+  }
+
+  return parseInt(value, 10)
+}
+
+const getRankField = (column) => {
+  if (column.key === "RANKING") {
+    return "RANKING"
+  }
+
+  if (column.key === "VALUE SCORE") {
+    return "VALUE_RANK"
+  }
+
+  return `${column.key}__RANK`
+}
+
+const addMetricRanks = (rows) => {
+  TABLE_COLUMNS.forEach((column) => {
+    if (!column.rankOrder || column.key === "RANKING") {
+      return
     }
-    row.VALUE_RANK = String(rank)
+
+    const rankField = getRankField(column)
+    const sorted = rows
+      .map((row) => ({
+        row,
+        value: getMetricValue(row[column.key], column.sort),
+      }))
+      .sort((a, b) => {
+        const diff = a.value - b.value
+        return column.rankOrder === "desc" ? -diff : diff
+      })
+
+    let rank = 1
+    sorted.forEach((item, index) => {
+      if (index > 0 && item.value !== sorted[index - 1].value) {
+        rank = index + 1
+      }
+
+      item.row[rankField] = String(rank)
+    })
   })
 
   return rows
@@ -202,8 +262,6 @@ const getPillClass = (rankValue) => {
 
   return "rank-pill--mid"
 }
-
-const parsePriceValue = (value) => parseFloat(String(value).replace(/[£,]/g, ""))
 
 const formatPriceDisplay = (value) => {
   const text = String(value).trim()
@@ -235,8 +293,7 @@ const formatCellDisplay = (row, column, allRows) => {
 const getColumnConfig = (key) => TABLE_COLUMNS.find((column) => column.key === key)
 
 const getCellPillClass = (row, column) => {
-  const rankKey = column.rankKey || column.key
-  return getPillClass(row[rankKey])
+  return getPillClass(row[getRankField(column)])
 }
 
 const sortRows = (rows, key, direction = "asc") => {
@@ -266,7 +323,7 @@ const sortRows = (rows, key, direction = "asc") => {
 class DestinationTable {
   constructor(container, rows) {
     this.container = document.querySelector(container)
-    this.baseRows = addValueRanks(rows)
+    this.baseRows = addMetricRanks(rows)
     this.filteredRows = sortRows([...this.baseRows], "RANKING", "asc")
     this.sortKey = "RANKING"
     this.activeSortKey = "RANKING"
