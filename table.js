@@ -67,6 +67,7 @@ const TABLE_COLUMNS = [
   },
 ]
 
+
 const ROWS_PER_PAGE = 10
 
 const HEADER_ICONS = {
